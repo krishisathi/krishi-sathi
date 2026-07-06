@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>Krishi Sathi · Farmer ID</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0,1" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #f0f5ee;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 16px;
+    }
+    .app-container {
+      max-width: 400px;
+      width: 100%;
+      background: #ffffff;
+      border-radius: 40px 40px 32px 32px;
+      box-shadow: 0 20px 40px rgba(0,40,20,0.12), 0 8px 20px rgba(0,20,10,0.08);
+      overflow: hidden;
+      padding: 20px 18px 28px;
+      position: relative;
+    }
+    .hello-overlay {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: #1e3b2c;
+      background-image: radial-gradient(circle at 20% 30%, #2a5a3a, #0f2a1a);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border-radius: 40px 40px 32px 32px;
+      z-index: 30;
+      pointer-events: none;
+      opacity: 1;
+      transition: opacity 0.3s ease;
+      color: white;
+      text-align: center;
+      padding: 20px;
+    }
+    .hello-overlay.hidden { opacity: 0; pointer-events: none; }
+    .hello-animation {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      animation: floatUp 1.8s ease-out forwards;
+    }
+    .hello-icon { font-size: 72px; margin-bottom: 12px; animation: pop 1.2s cubic-bezier(0.2,0.9,0.3,1.3) both; }
+    .hello-title {
+      font-size: 32px; font-weight: 700;
+      background: linear-gradient(135deg, #f9e05d, #f5c542);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hello-sub { font-size: 16px; opacity: 0.8; letter-spacing: 1px; }
+    @keyframes floatUp { 0% { transform: translateY(24px); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
+    @keyframes pop { 0% { transform: scale(0.5); opacity: 0; } 70% { transform: scale(1.1); } 100% { transform: scale(1); opacity: 1; } }
+
+    .form-section { opacity: 0; transition: opacity 0.5s ease; transition-delay: 0.1s; }
+    .form-section.visible { opacity: 1; }
+
+    .app-header {
+      display: flex; align-items: center; gap: 8px;
+      margin-bottom: 20px; padding-bottom: 6px;
+      border-bottom: 2px solid #e8f0e4;
+    }
+    .app-header h1 {
+      font-size: 22px; font-weight: 700; color: #1e3b2c;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .app-header h1 span {
+      background: #d9e8d2; padding: 4px 10px; border-radius: 40px;
+      font-size: 14px; font-weight: 600; color: #1f4a2a;
+    }
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 500, 'GRAD' 0, 'opsz' 24; }
+
+    .field-group { margin-bottom: 18px; }
+    .field-label {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 14px; font-weight: 600; color: #1f3d2b;
+      margin-bottom: 5px;
+    }
+    .field-label .material-symbols-outlined { font-size: 20px; color: #3b6b4a; }
+    input, select {
+      width: 100%; padding: 14px 16px;
+      background: #f5f9f3; border: 1.5px solid #dce8d6;
+      border-radius: 20px; font-size: 15px; font-weight: 500;
+      color: #142c1d; transition: 0.2s; outline: none;
+      font-family: 'Inter', sans-serif;
+    }
+    input:focus, select:focus {
+      border-color: #2c7a4a; background: #fafffc;
+      box-shadow: 0 0 0 4px rgba(44,122,74,0.12);
+    }
+    .inline-check {
+      display: flex; align-items: center; gap: 10px;
+      margin: 6px 0 10px;
+    }
+    .inline-check input[type="checkbox"] {
+      width: 18px; height: 18px; accent-color: #2a6e3e;
+      transform: scale(1.1); margin-right: 4px; flex-shrink: 0;
+    }
+    .inline-check label { font-size: 14px; font-weight: 500; color: #1f3d2b; }
+    .row-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .btn-save {
+      width: 100%; background: #1e3b2c; padding: 16px;
+      border: none; border-radius: 40px; font-weight: 700;
+      font-size: 18px; color: white;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      margin-top: 12px; cursor: pointer; transition: 0.2s;
+      box-shadow: 0 8px 16px rgba(26,67,41,0.25);
+    }
+    .btn-save:hover { background: #154d2a; transform: scale(0.98); }
+    .btn-save:active { transform: scale(0.96); }
+
+    .id-card-wrapper {
+      margin-top: 28px; background: #f6fbf5; border-radius: 30px;
+      padding: 16px 16px 20px; border: 1px solid #d1e4cc;
+      display: none; animation: cardPop 0.6s cubic-bezier(0.2,0.8,0.3,1.2);
+    }
+    .id-card-wrapper.active { display: block; }
+    @keyframes cardPop {
+      0% { opacity: 0; transform: scale(0.92) translateY(16px); }
+      100% { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    .id-card {
+      background: white; border-radius: 24px; padding: 20px 16px 16px;
+      box-shadow: 0 4px 12px rgba(0,30,10,0.08);
+      border-left: 6px solid #2a7a44;
+    }
+    .id-badge {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 8px;
+    }
+    .id-badge h3 {
+      font-size: 18px; font-weight: 700; color: #1a3d26;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .id-badge span {
+      background: #e3f0df; padding: 4px 12px; border-radius: 40px;
+      font-size: 13px; font-weight: 600; color: #1a552c;
+    }
+    .id-row {
+      display: flex; justify-content: space-between;
+      padding: 6px 0; border-bottom: 1px dashed #deecda;
+      font-size: 14px;
+    }
+    .id-row:last-child { border-bottom: none; }
+    .id-label { font-weight: 500; color: #3a5e46; }
+    .id-value { font-weight: 600; color: #142c1d; text-align: right; }
+    .id-footer {
+      margin-top: 12px; background: #eaf3e7; border-radius: 40px;
+      padding: 8px 14px; text-align: center; font-size: 13px;
+      font-weight: 600; color: #1d4f2b;
+      display: flex; justify-content: center; gap: 18px; flex-wrap: wrap;
+    }
+    .id-footer span { background: white; padding: 2px 12px; border-radius: 30px; }
+    .success-animation { text-align: center; margin-bottom: 12px; }
+    .success-animation .material-symbols-outlined {
+      font-size: 48px; color: #2a7a44; background: #dff0db;
+      padding: 12px; border-radius: 60px; font-variation-settings: 'FILL' 1;
+    }
+    .reset-link {
+      text-align: center; margin-top: 14px; font-size: 14px;
+      font-weight: 500; color: #2d6e3e; cursor: pointer;
+      text-decoration: underline; text-underline-offset: 3px;
+    }
+    .reset-link:active { opacity: 0.6; }
+    .mt-1 { margin-top: 4px; }
+
+    .popup-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.4); backdrop-filter: blur(4px);
+      display: none; justify-content: center; align-items: center;
+      z-index: 999; padding: 20px;
+    }
+    .popup-overlay.show { display: flex; }
+    .popup-card {
+      background: white; max-width: 340px; width: 100%;
+      border-radius: 40px; padding: 32px 24px 28px;
+      text-align: center; box-shadow: 0 30px 60px rgba(0,20,0,0.3);
+      animation: popupIn 0.4s cubic-bezier(0.2,0.9,0.3,1.2);
+    }
+    @keyframes popupIn {
+      0% { opacity: 0; transform: scale(0.8) translateY(20px); }
+      100% { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    .popup-card .material-symbols-outlined {
+      font-size: 64px; color: #2a7a44;
+      background: #e1f0dd; padding: 16px; border-radius: 60px;
+      font-variation-settings: 'FILL' 1;
+    }
+    .popup-card h2 { margin: 12px 0 6px; font-size: 24px; color: #1e3b2c; }
+    .popup-card p { color: #3f5e4a; font-size: 15px; margin-bottom: 20px; }
+    .popup-btn {
+      background: #1e3b2c; color: white; border: none;
+      padding: 12px 28px; border-radius: 40px; font-weight: 600;
+      font-size: 16px; cursor: pointer; transition: 0.2s;
+      display: inline-flex; align-items: center; gap: 8px;
+    }
+    .popup-btn:hover { background: #154d2a; }
+    .popup-btn-wa {
+      background: #25D366; color: white; border: none;
+      padding: 12px 28px; border-radius: 40px; font-weight: 600;
+      font-size: 16px; cursor: pointer; transition: 0.2s;
+      display: inline-flex; align-items: center; gap: 8px;
+      margin-left: 8px;
+    }
+    .popup-btn-wa:hover { background: #1da85c; }
+    .popup-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 6px; }
+
+    @media (max-width: 420px) { .app-container { padding: 16px 14px 24px; } .hello-title { font-size: 28px; } }
+  </style>
+</head>
+<body>
+
+<div class="app-container" id="appContainer">
+  <div class="hello-overlay" id="helloOverlay">
+    <div class="hello-animation">
+      <span class="material-symbols-outlined hello-icon">🌾</span>
+      <div class="hello-title">Hello Farmer!</div>
+      <div class="hello-sub">Krishi Sathi · </div>
+    </div>
+  </div>
+
+  <div class="form-section" id="formSection">
+    <div class="app-header">
+      <h1><span class="material-symbols-outlined">🌱</span> Krishi Sathi <span>🌱</span></h1>
+    </div>
+
+    <form id="farmerForm">
+      <div class="field-group">
+        <div class="field-label"><span class="material-symbols-outlined">person</span> Farmer name</div>
+        <input type="text" id="farmerName" placeholder="" required>
+      </div>
+
+      <div class="field-group">
+        <div class="field-label"><span class="material-symbols-outlined">phone_android</span> Mobile number</div>
+        <input type="tel" id="mobileNum" placeholder="" required pattern="[0-9]{10}">
+      </div>
+
+      <div class="field-group">
+        <div class="field-label"><span class="material-symbols-outlined">chat</span> WhatsApp number</div>
+        <input type="tel" id="whatsappNum" placeholder="" pattern="[0-9]{10}">
+        <div class="inline-check">
+          <input type="checkbox" id="sameAsMobile">
+          <label for="sameAsMobile">Same as mobile number</label>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <div class="field-label"><span class="material-symbols-outlined">map</span> Land details</div>
+        <input type="text" id="mujaName" placeholder="Muja name / village" required>
+      </div>
+      <div class="row-2col">
+        <input type="text" id="plotNumber" placeholder="Plot / khatiyan no." required>
+        <input type="text" id="area" placeholder="Area (acre / bigha)" required>
+      </div>
+
+      <div class="field-group mt-1">
+        <div class="field-label"><span class="material-symbols-outlined">badge</span> Epic number</div>
+        <input type="text" id="epicNumber" placeholder="Epic card number" required>
+      </div>
+
+      <button type="submit" class="btn-save">
+        <span class="material-symbols-outlined">check_circle</span> Register & Get Farmer ID
+      </button>
+    </form>
+
+    <div class="id-card-wrapper" id="idCardWrapper">
+      <div class="success-animation"><span class="material-symbols-outlined">verified</span></div>
+      <div class="id-card" id="idCard">
+        <div class="id-badge">
+          <h3><span class="material-symbols-outlined">agriculture</span> Farmer ID</h3>
+          <span>Krishi Sathi</span>
+        </div>
+        <div class="id-row"><span class="id-label">Name</span><span class="id-value" id="idName">-</span></div>
+        <div class="id-row"><span class="id-label">Mobile</span><span class="id-value" id="idMobile">-</span></div>
+        <div class="id-row"><span class="id-label">WhatsApp</span><span class="id-value" id="idWhatsapp">-</span></div>
+        <div class="id-row"><span class="id-label">Muja</span><span class="id-value" id="idMuja">-</span></div>
+        <div class="id-row"><span class="id-label">Plot / Khatiyan</span><span class="id-value" id="idPlot">-</span></div>
+        <div class="id-row"><span class="id-label">Area</span><span class="id-value" id="idArea">-</span></div>
+        <div class="id-row"><span class="id-label">Epic</span><span class="id-value" id="idEpic">-</span></div>
+        <div class="id-footer">
+          <span>🌱 Farmer ID: #<span id="idNumberDisplay">F-2026-</span></span>
+          <span>✅ verified</span>
+        </div>
+      </div>
+      <div class="reset-link" id="resetButton">+ Register another farmer</div>
+    </div>
+  </div>
+</div>
+
+<div class="popup-overlay" id="successPopup">
+  <div class="popup-card">
+    <span class="material-symbols-outlined">check_circle</span>
+    <h2>✅ Registration Successful!</h2>
+    <p><br>Farmer ID generated.</p>
+    <div class="popup-actions">
+      <button class="popup-btn" id="popupCloseBtn">OK</button>
+      <button class="popup-btn-wa" id="popupWhatsAppBtn">
+        <span class="material-symbols-outlined" style="font-size:20px;">whatsapp</span> Send Photos
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function() {
+    "use strict";
+
+    // 🔥 IMPORTANT: Replace this URL with your Google Apps Script Web App URL
+    const SHEET_URL = 'https://script.google.com/macros/s/AKfycbw5LMiGlyw6XJYIR5wrfjGw9oU4kjuARUxuRQF5uAfiv-jV42LhsEB1oxJiBEPvP-ld/exec';
+
+    const overlay = document.getElementById('helloOverlay');
+    const formSection = document.getElementById('formSection');
+    const form = document.getElementById('farmerForm');
+    const idCardWrapper = document.getElementById('idCardWrapper');
+    const resetBtn = document.getElementById('resetButton');
+    const popup = document.getElementById('successPopup');
+    const popupClose = document.getElementById('popupCloseBtn');
+    const popupWhatsApp = document.getElementById('popupWhatsAppBtn');
+
+    const nameInp = document.getElementById('farmerName');
+    const mobileInp = document.getElementById('mobileNum');
+    const whatsappInp = document.getElementById('whatsappNum');
+    const sameCheck = document.getElementById('sameAsMobile');
+    const mujaInp = document.getElementById('mujaName');
+    const plotInp = document.getElementById('plotNumber');
+    const areaInp = document.getElementById('area');
+    const epicInp = document.getElementById('epicNumber');
+
+    const idName = document.getElementById('idName');
+    const idMobile = document.getElementById('idMobile');
+    const idWhatsapp = document.getElementById('idWhatsapp');
+    const idMuja = document.getElementById('idMuja');
+    const idPlot = document.getElementById('idPlot');
+    const idArea = document.getElementById('idArea');
+    const idEpic = document.getElementById('idEpic');
+    const idNumberDisplay = document.getElementById('idNumberDisplay');
+
+    let lastFarmerName = '';
+    let lastFarmerId = '';
+
+    // Animation
+    setTimeout(() => {
+      overlay.classList.add('hidden');
+      formSection.classList.add('visible');
+    }, 2000);
+
+    // Same as mobile
+    sameCheck.addEventListener('change', function() {
+      if (this.checked) {
+        whatsappInp.value = mobileInp.value;
+        whatsappInp.disabled = true;
+      } else {
+        whatsappInp.disabled = false;
+        whatsappInp.value = '';
+      }
+    });
+    mobileInp.addEventListener('input', function() {
+      if (sameCheck.checked) whatsappInp.value = this.value;
+    });
+
+    // Submit
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const name = nameInp.value.trim();
+      const mobile = mobileInp.value.trim();
+      let whatsapp = whatsappInp.value.trim();
+      const muja = mujaInp.value.trim();
+      const plot = plotInp.value.trim();
+      const area = areaInp.value.trim();
+      const epic = epicInp.value.trim();
+
+      if (!name || !mobile || !muja || !plot || !area || !epic) {
+        alert('Please fill all required fields');
+        return;
+      }
+      if (!/^\d{10}$/.test(mobile)) {
+        alert('Mobile number must be 10 digits');
+        return;
+      }
+      if (whatsapp && !/^\d{10}$/.test(whatsapp)) {
+        alert('WhatsApp number must be 10 digits');
+        return;
+      }
+      if (!whatsapp) whatsapp = mobile;
+
+      const randomSuffix = Math.floor(1000 + Math.random() * 9000);
+      const farmerId = `F-2026-${randomSuffix}`;
+      lastFarmerName = name;
+      lastFarmerId = farmerId;
+
+      // Fill ID card
+      idName.textContent = name;
+      idMobile.textContent = mobile;
+      idWhatsapp.textContent = whatsapp;
+      idMuja.textContent = muja;
+      idPlot.textContent = plot;
+      idArea.textContent = area;
+      idEpic.textContent = epic;
+      idNumberDisplay.textContent = farmerId;
+
+      // Show card
+      form.style.display = 'none';
+      idCardWrapper.classList.add('active');
+      idCardWrapper.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+      // Send to Google Sheets
+      const payload = { name, mobile, whatsapp, muja, plot, area, epic, farmerId };
+
+      fetch(SHEET_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      }).then(() => {
+        setTimeout(() => popup.classList.add('show'), 400);
+      }).catch(() => {
+        setTimeout(() => popup.classList.add('show'), 400);
+      });
+
+      setTimeout(() => {
+        if (!popup.classList.contains('show')) popup.classList.add('show');
+      }, 1500);
+    });
+
+    // Popup actions
+    popupClose.addEventListener('click', () => popup.classList.remove('show'));
+    popup.addEventListener('click', (e) => { if (e.target === this) this.classList.remove('show'); });
+
+    popupWhatsApp.addEventListener('click', function() {
+      popup.classList.remove('show');
+      let waNumber = whatsappInp.value.trim() || mobileInp.value.trim();
+      waNumber = waNumber.replace(/\D/g, '');
+      if (waNumber.length === 10) waNumber = '91' + waNumber;
+      else if (waNumber.length === 12 && waNumber.startsWith('91')) { /* already ok */ }
+      else {
+        const mob = mobileInp.value.trim().replace(/\D/g, '');
+        waNumber = mob.length === 10 ? '91' + mob : '91' + mob;
+      }
+
+      const message = `🌾 *Krishi Sathi - Farmer Registration* 🌾\n\n✅ Farmer: ${lastFarmerName}\n🆔 ID: ${lastFarmerId}\n\n📸 Please send the following photos:\n1. Farmer's photo\n2. Land / farm photo\n3. Adhaar / Epic card photo\n\nThank you! 🙏`;
+      const waUrl = `https://wa.me/${waNumber}?text=${encodeURIComponent(message)}`;
+      window.open(waUrl, '_blank');
+    });
+
+    // Reset
+    resetBtn.addEventListener('click', function() {
+      form.reset();
+      whatsappInp.disabled = false;
+      sameCheck.checked = false;
+      idCardWrapper.classList.remove('active');
+      form.style.display = 'block';
+      idName.textContent = '-';
+      idMobile.textContent = '-';
+      idWhatsapp.textContent = '-';
+      idMuja.textContent = '-';
+      idPlot.textContent = '-';
+      idArea.textContent = '-';
+      idEpic.textContent = '-';
+      idNumberDisplay.textContent = 'F-2026-';
+      nameInp.focus();
+      popup.classList.remove('show');
+    });
+
+  })();
+</script>
+</body>
+</html>
