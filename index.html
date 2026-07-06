@@ -320,6 +320,9 @@
     // 🔥 IMPORTANT: Replace this URL with your Google Apps Script Web App URL
     const SHEET_URL = 'https://script.google.com/macros/s/AKfycbw5LMiGlyw6XJYIR5wrfjGw9oU4kjuARUxuRQF5uAfiv-jV42LhsEB1oxJiBEPvP-ld/exec';
 
+    // 👇 YOUR WHATSAPP NUMBER (without + sign)
+    const YOUR_WHATSAPP = '917865885382';
+
     const overlay = document.getElementById('helloOverlay');
     const formSection = document.getElementById('formSection');
     const form = document.getElementById('farmerForm');
@@ -439,18 +442,14 @@
     popupClose.addEventListener('click', () => popup.classList.remove('show'));
     popup.addEventListener('click', (e) => { if (e.target === this) this.classList.remove('show'); });
 
+    // WhatsApp button - sends message to YOUR number
     popupWhatsApp.addEventListener('click', function() {
       popup.classList.remove('show');
-      let waNumber = whatsappInp.value.trim() || mobileInp.value.trim();
-      waNumber = waNumber.replace(/\D/g, '');
-      if (waNumber.length === 10) waNumber = '91' + waNumber;
-      else if (waNumber.length === 12 && waNumber.startsWith('91')) { /* already ok */ }
-      else {
-        const mob = mobileInp.value.trim().replace(/\D/g, '');
-        waNumber = mob.length === 10 ? '91' + mob : '91' + mob;
-      }
+      
+      // Use YOUR WhatsApp number
+      const waNumber = YOUR_WHATSAPP;
 
-      const message = `🌾 *Krishi Sathi - Farmer Registration* 🌾\n\n✅ Farmer: ${lastFarmerName}\n🆔 ID: ${lastFarmerId}\n\n📸 Please send the following photos:\n1. Farmer's photo\n2. Land / farm photo\n3. Adhaar / Epic card photo\n\nThank you! 🙏`;
+      const message = `🌾 *Krishi Sathi - Farmer Registration* 🌾\n\n✅ Farmer: ${lastFarmerName}\n🆔 ID: ${lastFarmerId}\n📱 Mobile: ${mobileInp.value.trim()}\n💬 WhatsApp: ${whatsappInp.value.trim() || mobileInp.value.trim()}\n📍 Muja: ${mujaInp.value.trim()}\n📋 Plot: ${plotInp.value.trim()}\n📐 Area: ${areaInp.value.trim()}\n🪪 Epic: ${epicInp.value.trim()}\n\n📸 Please send the following photos:\n1. Farmer's photo\n2. Land / farm photo\n3. Adhaar / Epic card photo\n\nThank you! 🙏`;
       const waUrl = `https://wa.me/${waNumber}?text=${encodeURIComponent(message)}`;
       window.open(waUrl, '_blank');
     });
